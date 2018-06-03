@@ -8,8 +8,8 @@ import (
 
 type Story struct {
 	Rank  string
-	URL   string
 	Title string
+	URL   string
 }
 
 type topStoriesSnapshot struct {
