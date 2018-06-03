@@ -6,25 +6,34 @@ import (
 	"time"
 )
 
-type link struct {
-	URL string
+type Story struct {
+	Rank  string
+	URL   string
+	Title string
 }
 
-type topLinksSnapshot struct {
-	Links   []link
+type topStoriesSnapshot struct {
+	Stories []Story
 	FoundAt time.Time
 }
 
 func main() {
 	c := colly.NewCollector()
-	snapshot := topLinksSnapshot{FoundAt: time.Now()}
+	snapshot := topStoriesSnapshot{FoundAt: time.Now()}
 
-	c.OnHTML(".storylink", func(e *colly.HTMLElement) {
-		link := link{}
-		link.URL = e.Attr("href")
-		snapshot.Links = append(snapshot.Links, link)
+	c.OnHTML(".athing", func(e *colly.HTMLElement) {
+		story := CreateStory(e)
+		snapshot.Stories = append(snapshot.Stories, story)
 	})
 
 	c.Visit("https://news.ycombinator.com")
 	fmt.Println(snapshot)
+}
+
+func CreateStory(e *colly.HTMLElement) Story {
+	rank := e.ChildText(".rank")
+	url := e.ChildAttr(".storylink", "href")
+	title := e.ChildText(".storylink")
+
+	return Story{Rank: rank, URL: url, Title: title}
 }
